@@ -7,6 +7,21 @@ public class Burner {
 		Cold
 	}
 	
+	public String getMyTemperature() {
+		switch(myTemperature) {
+			case Cold:
+				return("cooool");
+			case Warm:
+				return("warm");
+			case Hot:
+				return("CAREFUL");
+			case Blazing:
+				return("VERY HOT! DON'T TOUCH");
+			default:
+				return("Invalid");
+		}
+	}
+
 	public Temperature myTemperature;
 	public Setting mySetting;
 	public int timer;
@@ -15,6 +30,7 @@ public class Burner {
 	public Burner() {
 		this.myTemperature = Temperature.Cold;
 		this.mySetting = Setting.OFF;
+		timer = 0;
 	}
 	
 	public void plusButton() {
@@ -51,5 +67,7 @@ public class Burner {
 		timer = TIME_DURATION;
 	}
 	
-	
+	public void updateTemperature() {
+		
+	}
 }
