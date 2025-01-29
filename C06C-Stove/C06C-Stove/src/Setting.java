@@ -1,3 +1,4 @@
+// Authors- Spencer Groth, Gabe De Matte
 enum Setting {
 	OFF("---"),
 	LOW("--+"),

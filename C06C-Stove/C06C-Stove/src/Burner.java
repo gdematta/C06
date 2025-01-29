@@ -1,3 +1,4 @@
+// Authors- Spencer Groth, Gabe De Matte
 public class Burner {
     
     enum Temperature {
@@ -7,24 +8,15 @@ public class Burner {
         Cold
     }
     
-    enum Setting {
-        OFF,
-        LOW,
-        MEDIUM,
-        HIGH
-    }
-
     public Temperature myTemperature;
     public Setting mySetting;
     public int timer;
     public final static int TIME_DURATION = 2;
-    public int heatDuration; // tracks how long the burner has been heating or cooling (on or off)
     
     public Burner() {
         this.myTemperature = Temperature.Cold;
         this.mySetting = Setting.OFF;
         timer = 0;
-        heatDuration = 0;
     }
     
     public void plusButton() {
@@ -62,47 +54,41 @@ public class Burner {
     }
     
     public void updateTemperature() {
+    	// Update the timer every loop
         if (timer > 0) {
             timer--;  
         }
-
-        if (mySetting != Setting.OFF) {
-            heatDuration++; // increases the duration since the burner was turned on
-        } else if (heatDuration > 0) {
-            heatDuration--; // slowly decreases when turned off
-        }
-
-        if (timer == 0) {
+        
+        // This case statement will adjust the temperatures based on the current state. We used the enum values() and ordinal() to cycle through the states.
+        if (timer == 0) { 
             switch (mySetting) {
-                case OFF:
+                case OFF: // While off, if the current heat isn't cold, increase the temp by one stage
                     if (myTemperature != Temperature.Cold) {
+                        myTemperature = Temperature.values()[myTemperature.ordinal() + 1];
+                    }
+                    break;
+                case LOW: // While low, if the current heat isn't warm or cold, increase the temp by one stage. If it is cold, decrease the temp by one stage
+                    if ((myTemperature != Temperature.Warm) && (myTemperature != Temperature.Cold)) {
+                        myTemperature = Temperature.values()[myTemperature.ordinal() + 1];
+                    } else if (myTemperature == Temperature.Cold) {
+                    	myTemperature = Temperature.values()[myTemperature.ordinal() - 1];
+                    }
+                    break;
+                case MEDIUM: // While medium, if the current heat isn't hot or blazing, decrease the temp by one stage. If it is blazing, increase the temp by one stage
+                    if ((myTemperature != Temperature.Hot) && (myTemperature != Temperature.Blazing)) {
                         myTemperature = Temperature.values()[myTemperature.ordinal() - 1];
+                    } else if (myTemperature == Temperature.Blazing) {
+                    	myTemperature = Temperature.values()[myTemperature.ordinal() + 1];
                     }
                     break;
-                case LOW:
-                    if (heatDuration <= TIME_DURATION) {
-                        myTemperature = Temperature.Cold; // initially starts as Cold
-                    } else if (myTemperature != Temperature.Warm) {
-                        myTemperature = Temperature.Warm;
-                    }
-                    break;
-                case MEDIUM:
-                    if (myTemperature != Temperature.Hot) {
-                        myTemperature = Temperature.Hot;
-                    }
-                    break;
-                case HIGH:
+                case HIGH: // While HIGH, if the current heat isn't blazing decrease the temp by one stage
                     if (myTemperature != Temperature.Blazing) {
-                        myTemperature = Temperature.Blazing;
+                        myTemperature = Temperature.values()[myTemperature.ordinal() - 1];
                     }
                     break;
             }
         }
 
-        // handles case where burner is turned up from CAREFUL to VERY HOT! DON'T TOUCH!
-        if (mySetting == Setting.HIGH && myTemperature == Temperature.Hot) {
-            myTemperature = Temperature.Blazing;
-        }
     }
 
     public String getMyTemperature() {
@@ -121,12 +107,6 @@ public class Burner {
     }
 
     public void display() {
-        int plusSigns = Math.min(heatDuration / TIME_DURATION, 3);
-        String status = "[";
-        for (int i = 0; i < 3 - plusSigns; i++) status += "-";
-        for (int i = 0; i < plusSigns; i++) status += "+";
-        status += "]..... " + getMyTemperature();
-        
-        System.out.println(status);
+    	System.out.println("[" + mySetting + "]...." + getMyTemperature());
     }
 }
